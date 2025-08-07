@@ -39,6 +39,15 @@ app.use("/api/messages", messageRoute);
 app.use("/api/reviews", reviewRoute);
 app.use("/api/upload", uploadRoute); // ✅ Image upload route
 
+// ✅ Add Root Route for localhost:5000
+app.get("/", (req, res) => {
+  res.send(`
+    <h1>🚀 Gigly Backend Server is Running!</h1>
+    <p>You are accessing <code>http://localhost:${PORT}</code></p>
+    <p>Use <code>/api</code> routes to access backend APIs.</p>
+  `);
+});
+
 // ✅ Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
@@ -51,8 +60,6 @@ mongoose
 
 // ✅ Start server
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`\n🚀 Server is running at: http://localhost:${PORT}\n`);
 });
-
