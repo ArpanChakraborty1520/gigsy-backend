@@ -1,8 +1,14 @@
+// server.js or index.js
+
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Import routes
 import authRoute from "./routes/auth.route.js";
 import userRoute from "./routes/user.route.js";
 import gigRoute from "./routes/gig.route.js";
@@ -10,26 +16,25 @@ import orderRoute from "./routes/order.route.js";
 import conversationRoute from "./routes/conversation.route.js";
 import messageRoute from "./routes/message.route.js";
 import reviewRoute from "./routes/review.route.js";
-import uploadRoute from "./routes/upload.route.js"; // ✅ Import upload route
-import path from "path";
-import { fileURLToPath } from "url";
+import uploadRoute from "./routes/upload.route.js";
 
+// Initialize app
 const app = express();
 dotenv.config();
 
-// ✅ Fix ES modules __dirname
+// __dirname workaround for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Middleware
+// Middlewares
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Serve uploaded files statically
+// Serve static files (uploads)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ✅ Routes
+// Routes
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/gigs", gigRoute);
@@ -37,29 +42,28 @@ app.use("/api/orders", orderRoute);
 app.use("/api/conversations", conversationRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/reviews", reviewRoute);
-app.use("/api/upload", uploadRoute); // ✅ Image upload route
+app.use("/api/upload", uploadRoute);
 
-// ✅ Add Root Route for localhost:5000
+// Root route for testing
 app.get("/", (req, res) => {
   res.send(`
-    <h1>🚀 Gigly Backend Server is Running!</h1>
-    <p>You are accessing <code>http://localhost:${PORT}</code></p>
-    <p>Use <code>/api</code> routes to access backend APIs.</p>
+    <h1>🚀 Gigsy Backend Server is Live!</h1>
+    <p>Base API URL: <code>/api</code></p>
   `);
 });
 
-// ✅ Connect to MongoDB
+// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("MongoDB connected ✅");
+    console.log("✅ MongoDB connected");
   })
   .catch((err) => {
-    console.error("MongoDB connection failed ❌", err);
+    console.error("❌ MongoDB connection failed:", err);
   });
 
-// ✅ Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n🚀 Server is running at: http://localhost:${PORT}\n`);
+// Start server on dynamic port for Render
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server is running and listening on PORT: ${PORT}`);
 });
